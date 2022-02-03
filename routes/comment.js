@@ -15,6 +15,7 @@ router.post("/saveComment", (req, res) => {
     //   if (err) return res.status(400).send(err);
     //   return res.status(200).json({ success: true, comment });
     // });
+
     Comment.find({ _id: comment._id })
       .populate("writer")
       .exec((err, info) => {
@@ -33,6 +34,25 @@ router.post("/getComments", (req, res) => {
       if (err) return res.status(400).send(err);
       return res.status(200).json({ success: true, comments });
     });
+});
+
+router.post("/deleteComment", (req, res) => {
+  console.log("delete comment request body:", req.body);
+
+  let variable = {};
+
+  if (req.body._id) {
+    variable = { _id: req.body._id, writer: req.body.writer };
+  } else {
+    variable = { postId: req.body.postId, writer: req.body.writer };
+  }
+
+  console.log("delete comment variable:", variable);
+
+  Comment.findOneAndDelete(variable).exec((err, result) => {
+    if (err) return res.status(400).json({ success: false, err });
+    return res.status(200).json({ success: true, result });
+  });
 });
 
 module.exports = router;
